@@ -49,18 +49,20 @@ const SignUpPage = () => {
 
   return (
     <>
-      <h1>Sign Up</h1>
-      <label htmlFor="username">Username</label>
-      <input id="username" onChange={onChange} />
-      <label htmlFor="email">E-mail</label>
-      <input id="email" onChange={onChange} />
-      <label htmlFor="password">Password</label>
-      <input id="password" type={"password"} onChange={onChange} />
-      <label htmlFor="repeat-password">Repeat Password</label>
-      <input type="password" id="repeat-password" onChange={onChange} />
-      <button disabled={disabled} type="submit" onClick={onClick}>
-        Sign Up
-      </button>
+      <form>
+        <h1>Sign Up</h1>
+        <label htmlFor="username">Username</label>
+        <input id="username" onChange={onChange} />
+        <label htmlFor="email">E-mail</label>
+        <input id="email" onChange={onChange} />
+        <label htmlFor="password">Password</label>
+        <input id="password" type={"password"} onChange={onChange} />
+        <label htmlFor="repeat-password">Repeat Password</label>
+        <input type="password" id="repeat-password" onChange={onChange} />
+        <button disabled={disabled} type="submit" onClick={onClick}>
+          Sign Up
+        </button>
+      </form>
     </>
   );
 };
