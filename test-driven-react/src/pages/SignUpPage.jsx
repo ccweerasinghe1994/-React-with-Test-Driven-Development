@@ -10,7 +10,6 @@ const SignUpPage = () => {
 
   const onChange = (e) => {
     const { value, id } = e.target;
-    console.log(value, id);
     if (id === "password") {
       setPassword(value);
     }

@@ -32,7 +32,6 @@ const SignUpPage = () => {
 
   const onChange = (e) => {
     const { value, id } = e.target;
-    console.log(value, id);
     if (id === "password") {
       setPassword(value);
     }
@@ -193,3 +192,29 @@ describe("signup page", () => {
 });
 
 ```
+output from the test:
+
+```js
+ PASS  src/pages/SignUpPage.test.js
+  signup page
+    Layout
+      √ has header (68 ms)
+      √ has username input (11 ms)
+      √ has email input (6 ms)
+      √ has password input (8 ms)
+      √ has password type for input (5 ms)
+      √ has password repeat input (4 ms)
+      √ has password type for password repeat input (5 ms)
+      √ has submit button (19 ms)
+      √ disables the button initially (17 ms)
+    interactions
+      √ enables the button when the password and repeat password match (71 ms)
+      √ send username, password, email to the backend (77 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       11 passed, 11 total
+Snapshots:   0 total
+Time:        2.199 s
+Ran all test suites.
+```
+
