@@ -6,6 +6,7 @@
     - [App Page](#app-page)
     - [SignUp Page Test file](#signup-page-test-file)
     - [remove these files](#remove-these-files)
+    - [test output](#test-output)
   - [Layout - Sign Up Form](#layout---sign-up-form)
   - [Form Interactions](#form-interactions)
   - [Api Request - Sign Up](#api-request---sign-up)
@@ -62,6 +63,10 @@ describe('signup page', () => {
 ### remove these files
 
 App.css,App.test.js,Logo and etc
+
+### test output
+
+![test output](../img/1.png)
 
 ## Layout - Sign Up Form
 
