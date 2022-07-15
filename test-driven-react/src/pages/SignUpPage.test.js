@@ -10,6 +10,11 @@ describe('signup page', () => {
       expect(header).toBeInTheDocument();
     });
 
+    it('has user input', () => {
+      const { container } = render(<SignUpPage />);
+      const input = container.querySelector('input');
+      expect(input).toBeInTheDocument();
+    });
     it('has username input', () => {
       render(<SignUpPage />);
       const input = screen.getByLabelText('Username');

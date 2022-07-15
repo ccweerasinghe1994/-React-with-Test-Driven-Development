@@ -8,6 +8,9 @@
     - [remove these files](#remove-these-files)
     - [test output](#test-output)
   - [Layout - Sign Up Form](#layout---sign-up-form)
+    - [we can use the container from the render(👎NOT RECOMMENDED)](#we-can-use-the-container-from-the-rendernot-recommended)
+    - [SignUp Button](#signup-button)
+    - [test result](#test-result)
   - [Form Interactions](#form-interactions)
   - [Api Request - Sign Up](#api-request---sign-up)
   - [Mocking Mock Service Worker (MSW)](#mocking-mock-service-worker-msw)
@@ -69,6 +72,260 @@ App.css,App.test.js,Logo and etc
 ![test output](../img/1.png)
 
 ## Layout - Sign Up Form
+
+### we can use the container from the render(👎NOT RECOMMENDED)
+
+```jsx
+const SignUpPage = ()=>{
+  react <>
+  <h1>Sign Up</h1>
+  <input/>
+  <input/>
+  </>
+}
+
+export default SignUpPage;
+
+```
+
+```jsx
+it('has userName input', () => {
+  const { container } = render(<SignUpPage />);
+  const input = container.querySelector('input');
+  expect(input).toBeInTheDocument();
+});
+
+it('has email input', () => {
+  const { container } = render(<SignUpPage />);
+  // this will return an Array
+  const input = container.querySelectorAll('input');
+  expect(input.length).toBe(2);
+});
+```
+
+this is not a good way to test the code.
+because these test are not specific and they are tied to the dom structure.
+so let's fix this. let's add some place holders to the input.
+
+```jsx
+const SignUpPage = ()=>{
+  react <>
+  <h1>Sign Up</h1>
+  <input placeholder="username"/>
+  <input placeholder="email"/>
+  </>
+}
+
+export default SignUpPage;
+
+```
+
+and we wil use screen to test the input.
+where we have
+
+- 🥇 queryBy..
+- 🥇 getBy...
+- 🥇 findBy...
+
+```jsx
+it('has userName input', () => {
+  render(<SignUpPage />);
+  const input = screen.getByPlaceholder('username');
+  expect(input).toBeInTheDocument();
+});
+
+it('has email input', () => {
+  render(<SignUpPage />);
+  const input = screen.getByPlaceholder('email');
+  expect(input.length).toBe(2);
+});
+```
+
+and tets are passing.
+![test output](../img/2.png)
+
+let's use Labels instead of place holders.
+
+```jsx
+const SignUpPage = ()=>{
+  react <>
+  <h1>Sign Up</h1>
+  <input htmlFor="username/>
+  <label id="username">Username</label>
+  <input htmlFor="email"/>
+  <label id="email" >Email</label>
+  </>
+}
+
+export default SignUpPage;
+```
+
+now test will fail because we removed the place holders.
+
+now let's change the test to use the labels.
+
+```jsx
+it('has userName input', () => {
+  render(<SignUpPage />);
+  const input = screen.getByLabelText('Username');
+  expect(input).toBeInTheDocument();
+});
+
+it('has email input', () => {
+  render(<SignUpPage />);
+  const input = screen.getByLabelText('Email');
+  expect(input.length).toBe(2);
+});
+```
+
+and add the password test
+
+```jsx
+it('has password input', () => {
+  render(<SignUpPage />);
+  const input = screen.getByLabelText('Password');
+  expect(input.length).toBe(2);
+});
+```
+
+it's failing so let's fix this.
+
+let's add password
+
+```jsx
+const SignUpPage = ()=>{
+  react <>
+  <h1>Sign Up</h1>
+  <input htmlFor="username/>
+  <label id="username">Username</label>
+  <input htmlFor="email"/>
+  <label id="email" >Email</label>
+  <input htmlFor="password"/>
+  <label id="password" >Password</label>
+  </>
+}
+
+export default SignUpPage;
+```
+
+password is not masking
+let's write the test for it
+
+```jsx
+it('has password type for password input', () => {
+  render(<SignUpPage />);
+  const input = screen.getByLabelText('Password');
+  expect(input.type).toBe('password');
+});
+```
+
+let's add masking
+
+```jsx
+const SignUpPage = ()=>{
+  react <>
+  <h1>Sign Up</h1>
+  <input htmlFor="username/>
+  <label id="username">Username</label>
+  <input htmlFor="email"/>
+  <label id="email" >Email</label>
+  <input htmlFor="password"/>
+  <label id="password" >Password</label>
+  <input type="password" htmlFor="password"/>
+  </>
+}
+```
+
+let's add repeat password
+let's write test for it.
+
+```jsx
+it('has repeat password input', () => {
+  render(<SignUpPage />);
+  const input = screen.getByLabelText('Repeat Password');
+  expect(input).toBeInTheDocument();
+});
+
+it('has password type for repeat password input', () => {
+  render(<SignUpPage />);
+  const input = screen.getByLabelText('Repeat Password');
+  expect(input.type).toBe('password');
+});
+```
+
+tests are failing so
+let's add it to the component
+
+```jsx
+const SignUpPage = ()=>{
+  react <>
+  <h1>Sign Up</h1>
+  <input htmlFor="username/>
+  <label id="username">Username</label>
+  <input htmlFor="email"/>
+  <label id="email" >Email</label>
+  <input htmlFor="password"/>
+  <label id="password" >Password</label>
+  <input type="password" htmlFor="password"/>
+  <label id="passwordRepeat" >Password</label>
+  <input type="password" htmlFor="passwordRepeat"/>
+  </>
+}
+```
+
+### SignUp Button
+
+let's add signUp Button
+let's write the test for it
+
+```jsx
+it('has submit button', () => {
+  render(<SignUpPage />);
+  const button = screen.queryByRole('button', { name: 'Sign Up' });
+  expect(button).toBeInTheDocument();
+});
+```
+
+so the test it failing.
+let's add the button.
+
+```jsx
+const SignUpPage = ()=>{
+  react <>
+  <h1>Sign Up</h1>
+  <input htmlFor="username/>
+  <label id="username">Username</label>
+  <input htmlFor="email"/>
+  <label id="email" >Email</label>
+  <input htmlFor="password"/>
+  <label id="password" >Password</label>
+  <input type="password" htmlFor="password"/>
+  <label id="passwordRepeat" >Password</label>
+  <input type="password" htmlFor="passwordRepeat"/>
+  <button>Sign Up</button>
+  </>
+}
+```
+
+let's test if the button is disabled initially
+
+```jsx
+it('disabled the button initially', () => {
+  render(<SignUpPage />);
+  const button = screen.queryByRole('button', { name: 'Sign Up' });
+  expect(button).toBeDisabled();
+});
+```
+
+add the functionality
+
+```jsx
+<button disabled>Sign Up</button>
+```
+
+### test result
+
+![all the tests so far](../img/3.png)
 
 ## Form Interactions
 
