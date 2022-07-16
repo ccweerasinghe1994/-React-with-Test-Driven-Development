@@ -24,14 +24,14 @@ const SignUpPage = () => {
     }
   };
 
-  const onClick = (event) => {
-    event.preventDefault();
+  const onClick = async (event) => {
+    event.preventDefault(); 
     const body = {
       username: user,
       email,
       password,
     };
-    axios.post("http://localhost:5000/api/users/signup", body);
+    await axios.post("api/1.0/users", body);
   };
 
   useEffect(() => {

@@ -473,14 +473,14 @@ import { useEffect, useState } from "react";
 const [user, setUser] = useState("");
 const [email, setEmail] = useState("");
 
-const onClick = (event) => {
-    event.preventDefault();
-    const body = {
-      username: user,
-      email,
-      password,
-    };
-    axios.post("http://localhost:5000/api/users/signup", body);
+const onClick = async (event) => {
+  event.preventDefault(); 
+  const body = {
+    username: user,
+    email,
+    password,
+  };
+  await axios.post("api/1.0/users", body);
 };
 ```
 
@@ -534,6 +534,8 @@ now we can do the assertion part
 ```
 
 ## Mocking Mock Service Worker (MSW)
+
+instead of using the axios we can use the builtin fetch api
 
 ## Proxy
 
