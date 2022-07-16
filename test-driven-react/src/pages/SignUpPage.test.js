@@ -2,6 +2,7 @@ import SignUpPage from '../pages/SignUpPage';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import axios from 'axios';
+import {setupServer} from 'msw/node';
 describe('signup page', () => {
   describe('Layout', () => {
     it('has header', () => {
@@ -76,6 +77,7 @@ describe('signup page', () => {
     });
 
     it('send username, password, email to the backend', () => {
+      const server = setupServer();
       render(<SignUpPage />);
       const usernameInput = screen.getByLabelText('Username');
       const emailInput = screen.getByLabelText('E-mail');
@@ -87,10 +89,15 @@ describe('signup page', () => {
       userEvent.type(repeatPasswordInput, 'password');
       const button = screen.getByRole('button', { name: 'Sign Up' });
       const mockFn = jest.fn();
-      axios.post = mockFn;
+      // axios.post = mockFn;
+      // let's mock the fetch function 
+      window.fetch = mockFn;
       userEvent.click(button);
       const firstCallOfTheMockFunction = mockFn.mock.calls[0];
-      const body = firstCallOfTheMockFunction[1];
+      // this firstCallOfTheMockFunction[1] will return a object
+      // which is in as a String
+      // let's convert it back to js Object before comparison
+      const body = JSON.parse(firstCallOfTheMockFunction[1].body);
       expect(body).toEqual({
         username: 'username',
         email: 'abc@gmail.com',

@@ -31,7 +31,14 @@ const SignUpPage = () => {
       email,
       password,
     };
-    await axios.post("api/1.0/users", body);
+    // await axios.post("api/1.0/users", body);
+    fetch("api/1.0/users", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
+    })
   };
 
   useEffect(() => {

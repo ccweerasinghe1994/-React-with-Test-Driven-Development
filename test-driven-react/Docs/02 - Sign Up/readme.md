@@ -16,6 +16,8 @@
     - [interactions](#interactions)
   - [Api Request - Sign Up](#api-request---sign-up)
   - [Mocking Mock Service Worker (MSW)](#mocking-mock-service-worker-msw)
+    - [Mocking Mock Service Worker (MSW)](#mocking-mock-service-worker-msw-1)
+    - [msw](#msw)
   - [Proxy](#proxy)
   - [Styling](#styling)
   - [Progress Indicator](#progress-indicator)
@@ -536,6 +538,68 @@ now we can do the assertion part
 ## Mocking Mock Service Worker (MSW)
 
 instead of using the axios we can use the builtin fetch api
+let's do that
+
+```jsx
+  fetch("api/1.0/users", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
+    })
+```
+
+so this will behave as same as axios
+
+but now we have to mock fetch api
+
+```jsx
+ it('send username, password, email to the backend', () => {
+      render(<SignUpPage />);
+      const usernameInput = screen.getByLabelText('Username');
+      const emailInput = screen.getByLabelText('E-mail');
+      const passwordInput = screen.getByLabelText('Password');
+      const repeatPasswordInput = screen.getByLabelText('Repeat Password');
+      userEvent.type(usernameInput, 'username');
+      userEvent.type(emailInput, 'abc@gmail.com');
+      userEvent.type(passwordInput, 'password');
+      userEvent.type(repeatPasswordInput, 'password');
+      const button = screen.getByRole('button', { name: 'Sign Up' });
+      const mockFn = jest.fn();
+      // axios.post = mockFn;
+      // let's mock the fetch function 
+      window.fetch = mockFn;
+      userEvent.click(button);
+      const firstCallOfTheMockFunction = mockFn.mock.calls[0];
+      // this firstCallOfTheMockFunction[1] will return a object
+      // which is in as a String
+      // let's convert it back to js Object before comparison
+      const body = JSON.parse(firstCallOfTheMockFunction[1].body);
+      expect(body).toEqual({
+        username: 'username',
+        email: 'abc@gmail.com',
+        password: 'password',
+      });
+    });
+ ```
+
+### [Mocking Mock Service Worker (MSW)](https://mswjs.io/)
+
+![mswjs](./../img/5.png)
+
+so we can mock the request not api
+these are interceptors which will cath the request made by the browser.
+as in intercept.
+then we can mimic the response.
+
+### msw
+
+let's add the msw dependency
+
+```jsx
+npm i -D msw
+```
 
 ## Proxy
 
