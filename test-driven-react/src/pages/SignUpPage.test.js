@@ -2,7 +2,9 @@ import SignUpPage from '../pages/SignUpPage';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import axios from 'axios';
-import {setupServer} from 'msw/node';
+import { setupServer } from 'msw/node';
+import { rest } from 'msw';
+
 describe('signup page', () => {
   describe('Layout', () => {
     it('has header', () => {
@@ -76,8 +78,15 @@ describe('signup page', () => {
       expect(button).not.toBeDisabled();
     });
 
-    it('send username, password, email to the backend', () => {
-      const server = setupServer();
+    it('send username, password, email to the backend', async () => {
+      let requestBody;
+      const server = setupServer(
+        rest.post("/api/1.0/users", (req, res, ctx) => {
+          requestBody = req.body;
+          return res(ctx.status(200))
+        })
+      );
+      server.listen()
       render(<SignUpPage />);
       const usernameInput = screen.getByLabelText('Username');
       const emailInput = screen.getByLabelText('E-mail');
@@ -88,17 +97,9 @@ describe('signup page', () => {
       userEvent.type(passwordInput, 'password');
       userEvent.type(repeatPasswordInput, 'password');
       const button = screen.getByRole('button', { name: 'Sign Up' });
-      const mockFn = jest.fn();
-      // axios.post = mockFn;
-      // let's mock the fetch function 
-      window.fetch = mockFn;
       userEvent.click(button);
-      const firstCallOfTheMockFunction = mockFn.mock.calls[0];
-      // this firstCallOfTheMockFunction[1] will return a object
-      // which is in as a String
-      // let's convert it back to js Object before comparison
-      const body = JSON.parse(firstCallOfTheMockFunction[1].body);
-      expect(body).toEqual({
+      await new Promise(resolve => setTimeout(resolve, 500))
+      expect(requestBody).toEqual({
         username: 'username',
         email: 'abc@gmail.com',
         password: 'password',

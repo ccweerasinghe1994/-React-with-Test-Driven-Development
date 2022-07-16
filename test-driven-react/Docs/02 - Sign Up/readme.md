@@ -601,6 +601,57 @@ let's add the msw dependency
 npm i -D msw
 ```
 
+let's implement the msw.
+we will remove the mock code from the test
+
+```jsx
+
+import { setupServer } from 'msw/node';
+import { rest } from 'msw';
+
+it('send username, password, email to the backend', async () => {
+    let requestBody;
+    const server = setupServer(
+      rest.post("/api/1.0/users", (req, res, ctx) => {
+        requestBody = req.body;
+        return res(ctx.status(200))
+      })
+    );
+    server.listen()
+    render(<SignUpPage />);
+    const usernameInput = screen.getByLabelText('Username');
+    const emailInput = screen.getByLabelText('E-mail');
+    const passwordInput = screen.getByLabelText('Password');
+    const repeatPasswordInput = screen.getByLabelText('Repeat Password');
+    userEvent.type(usernameInput, 'username');
+    userEvent.type(emailInput, 'abc@gmail.com');
+    userEvent.type(passwordInput, 'password');
+    userEvent.type(repeatPasswordInput, 'password');
+    const button = screen.getByRole('button', { name: 'Sign Up' });
+    userEvent.click(button);
+    await new Promise(resolve => setTimeout(resolve, 500))
+    expect(requestBody).toEqual({
+      username: 'username',
+      email: 'abc@gmail.com',
+      password: 'password',
+    });
+  });
+```
+
+now if we use axios or fetch we don't have to change the test.
+
+because we are intercepting the request.
+
+let's confirm that.
+
+remove the fetch functionally from the code and see if the tests are still passing.
+
+then we can see tests are not affected.
+
+with these libraries we can write reliable test cases.
+
+but the downside is it is tightly coupled with the implementation.
+
 ## Proxy
 
 ## Styling
