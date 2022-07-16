@@ -12,6 +12,8 @@
     - [SignUp Button](#signup-button)
     - [test result](#test-result)
   - [Form Interactions](#form-interactions)
+    - [current output](#current-output)
+    - [interactions](#interactions)
   - [Api Request - Sign Up](#api-request---sign-up)
   - [Mocking Mock Service Worker (MSW)](#mocking-mock-service-worker-msw)
   - [Proxy](#proxy)
@@ -329,7 +331,99 @@ add the functionality
 
 ## Form Interactions
 
+### current output
+
+![image](../img/4.png)
+
+### interactions
+
+let's write test for the interactions
+
+let's write a test to check if the password and repeat password are same button get enabled.
+
+```jsx
+
+  describe('interactions', () => {
+    it('enables the button when the password and repeat password match', () => {
+      render(<SignUpPage />);
+      const button = screen.getByRole('button', { name: 'Sign Up' });
+      const passwordInput = screen.getByLabelText('Password');
+      const repeatPasswordInput = screen.getByLabelText('Repeat Password');
+      userEvent.type(passwordInput, 'password');
+      userEvent.type(repeatPasswordInput, 'password');
+      expect(button).not.toBeDisabled();
+    });
+  });
+```
+
+this will fail because the button is disabled.
+
+let's implement the functionality.
+
+let's use hooks for this.
+
+```jsx
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [disabled, setDisabled] = useState(true);
+
+  
+  const onChange = (e) => {
+    const { value, id } = e.target;
+    if (id === "password") {
+      setPassword(value);
+    }
+    if (id === "repeat-password") {
+      setConfirmPassword(value);
+    }
+    if (id === "email") {
+      setEmail(value);
+    }
+    if (id === "username") {
+      setUser(value);
+    }
+  };
+
+    useEffect(() => {
+    if (
+      password.length > 0 &&
+      confirmPassword.length > 0 &&
+      password === confirmPassword
+    ) {
+      setDisabled(false);
+    } else {
+      setDisabled(true);
+    }
+  }, [confirmPassword, confirmPassword.length, password, password.length]);
+
+    return (
+    <>
+      <form>
+        <h1>Sign Up</h1>
+        <label htmlFor="username">Username</label>
+        <input id="username" onChange={onChange} />
+        <label htmlFor="email">E-mail</label>
+        <input id="email" onChange={onChange} />
+        <label htmlFor="password">Password</label>
+        <input id="password" type={"password"} onChange={onChange} />
+        <label htmlFor="repeat-password">Repeat Password</label>
+        <input type="password" id="repeat-password" onChange={onChange} />
+        <button disabled={disabled} type="submit" onClick={onClick}>
+          Sign Up
+        </button>
+      </form>
+    </>
+  );
+```
+
 ## Api Request - Sign Up
+
+let's make api calls for sign up
+ we will install axios  and use it to make api calls.
+
+```shell
+npm i axios
+```
 
 ## Mocking Mock Service Worker (MSW)
 
