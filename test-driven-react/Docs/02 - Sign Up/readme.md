@@ -425,6 +425,114 @@ let's make api calls for sign up
 npm i axios
 ```
 
+ let's write the test for it
+
+```jsx
+  it('send username, password, email to the backend', () => {
+      render(<SignUpPage />);
+      const usernameInput = screen.getByLabelText('Username');
+      const emailInput = screen.getByLabelText('E-mail');
+      const passwordInput = screen.getByLabelText('Password');
+      const repeatPasswordInput = screen.getByLabelText('Repeat Password');
+      userEvent.type(usernameInput, 'username');
+      userEvent.type(emailInput, 'abc@gmail.com');
+      userEvent.type(passwordInput, 'password');
+      userEvent.type(repeatPasswordInput, 'password');
+      const button = screen.getByRole('button', { name: 'Sign Up' });
+      const mockFn = jest.fn();
+      axios.post = mockFn;
+      userEvent.click(button);
+      const firstCallOfTheMockFunction = mockFn.mock.calls[0];
+      const body = firstCallOfTheMockFunction[1];
+      expect(body).toEqual({
+        username: 'username',
+        email: 'abc@gmail.com',
+        password: 'password',
+      });
+    });
+
+```
+
+test will fail
+
+let's implement the code
+
+```jsx
+<button disabled={disabled} type="submit" onClick={onClick}>
+  Sign Up
+</button>
+```
+
+let's write a onClick method
+
+```jsx
+import axios from "axios";
+import { useEffect, useState } from "react";
+
+// state to save the user and email
+const [user, setUser] = useState("");
+const [email, setEmail] = useState("");
+
+const onClick = (event) => {
+    event.preventDefault();
+    const body = {
+      username: user,
+      email,
+      password,
+    };
+    axios.post("http://localhost:5000/api/users/signup", body);
+};
+```
+
+we can't make a real api call in the test.
+because we should be able to run the app without a backend.
+for the test
+
+we are going to use the mock function from jest
+
+```jsx
+const mockFn = jest.fn();
+```
+
+so after clicking the button the mock function will be called
+and let's mock this post functionality
+
+```jsx
+axios.post = mockFn;
+```
+
+let's click the button
+
+```jsx
+userEvent.click(button);
+```
+
+this mock function has mock object which has a call array.
+which has the call history of the function.
+
+so we are looking for the first call
+
+```jsx
+const firstCallOfTheMockFunction = mockFn.mock.calls[0];
+```
+
+from this we can access the parameters of the function.
+first param is the url,but we need the body.
+
+```jsx
+ const body = firstCallOfTheMockFunction[1];
+```
+
+now we can do the assertion part
+
+```jsx
+ expect(body).toEqual({
+        username: 'username',
+        email: 'abc@gmail.com',
+        password: 'password',
+      });
+```
+
 ## Mocking Mock Service Worker (MSW)
 
 ## Proxy
