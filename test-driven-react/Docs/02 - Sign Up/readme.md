@@ -998,4 +998,228 @@ now let's add the spinner
 
 ## Layout - Sign Up Success
 
+let'a add a success message after a successful signup.
+
+```jsx
+ it('displays account activation notification after the successful signup request', async () => {
+
+      const server = setupServer(
+        rest.post("/api/1.0/users", (req, res, ctx) => {
+          return res(ctx.status(200))
+        })
+      );
+      server.listen();
+
+      setup();
+      const message = "Please check your email to activate the account";
+      expect(screen.queryByText(message)).not.toBeInTheDocument();
+      userEvent.click(button);
+      const text = await screen.findByText(message);
+      expect(text).toBeInTheDocument();
+    });
+```
+
+now the tests are failing we have to add the implementation.
+
+```jsx
+const [signUpSuccess, setSignUpSuccess] = useState(false);
+
+const onClick = async (event) => {
+  event.preventDefault();
+  const body = {
+    username: user,
+    email,
+    password,
+  };
+  setApiProgress(true);
+  const response = await axios.post("/api/1.0/users", body);
+  if (response) {
+    setSignUpSuccess(true)
+  };
+};
+
+</form>
+    {
+      signUpSuccess && <div className="alert alert-success mt-3" >Please check your email to activate the account</div>
+    }
+</div>
+```
+
+let's change to hide the form after a successful signUp.
+let's write the test first.
+
+```jsx
+ it("hides the signUp form after successful signup request", async () => {
+      const server = setupServer(
+        rest.post("/api/1.0/users", (req, res, ctx) => {
+          return res(ctx.status(200))
+        })
+      );
+      server.listen();
+
+      setup();
+
+      const form = screen.getByTestId('form-sign-up');
+      userEvent.click(button);
+
+      // we can use this or
+      await waitFor(() => {
+        expect(form).not.toBeInTheDocument();
+      })
+      // we can use this.
+      // await waitForElementToBeRemoved(form)
+    })
+```
+
+let's implement this.
+
+```jsx
+ {!signUpSuccess && <form className="card mt-5" data-testid="form-sign-up" >
+        .... form content
+      </form>}
+
+```
+
 ## Refactor - Test Lifecycle Async Await
+
+let's refactor our tests.
+
+```jsx
+  describe('interactions', () => {
+    let requestBody;
+    let counter = 0;
+
+    const server = setupServer(
+      rest.post('/api/1.0/users', (req, res, ctx) => {
+        requestBody = req.body;
+        counter = counter + 1;
+        return res(ctx.status(200));
+      })
+    );
+
+    beforeEach(() => {
+      counter = 0;
+    });
+
+    beforeAll(() => server.listen());
+
+    afterAll(() => server.close());
+
+    let button;
+
+    const setup = () => {
+      render(<SignUpPage />);
+
+      const usernameInput = screen.getByLabelText('Username');
+      const emailInput = screen.getByLabelText('E-mail');
+      const passwordInput = screen.getByLabelText('Password');
+      const repeatPasswordInput = screen.getByLabelText('Repeat Password');
+
+      userEvent.type(usernameInput, 'username');
+      userEvent.type(emailInput, 'abc@gmail.com');
+      userEvent.type(passwordInput, 'password');
+      userEvent.type(repeatPasswordInput, 'password');
+
+      button = screen.getByRole('button', { name: 'Sign Up' });
+    };
+
+    it('enables the button when the password and repeat password match', () => {
+      setup();
+
+      expect(button).not.toBeDisabled();
+    });
+
+    it('send username, password, email to the backend', async () => {
+      setup();
+
+      userEvent.click(button);
+
+      await screen.findByText(
+        'Please check your email to activate the account'
+      );
+
+      expect(requestBody).toEqual({
+        username: 'username',
+        email: 'abc@gmail.com',
+        password: 'password',
+      });
+    });
+
+    it('disable the signUp button when there is a ongoing signUp', async () => {
+      setup();
+
+      userEvent.click(button);
+      userEvent.click(button);
+
+      await screen.findByText(
+        'Please check your email to activate the account'
+      );
+
+      expect(counter).toBe(1);
+    });
+
+    it('display spinner after clicking the submit', async () => {
+      setup();
+
+      expect(screen.queryByRole('status')).not.toBeInTheDocument();
+
+      userEvent.click(button);
+
+      const spinner = screen.getByRole('status');
+
+      expect(spinner).toBeInTheDocument();
+      // here we are waiting until the text appear on the dom
+      await screen.findByText(
+        'Please check your email to activate the account'
+      );
+    });
+
+    it('displays account activation notification after the successful signup request', async () => {
+      setup();
+
+      const message = 'Please check your email to activate the account';
+
+      expect(screen.queryByText(message)).not.toBeInTheDocument();
+
+      userEvent.click(button);
+
+      const text = await screen.findByText(message);
+
+      expect(text).toBeInTheDocument();
+    });
+
+    it('hides the signUp form after successful signup request', async () => {
+      setup();
+
+      const form = screen.getByTestId('form-sign-up');
+
+      userEvent.click(button);
+
+      // we can use this or
+      await waitFor(() => {
+        expect(form).not.toBeInTheDocument();
+      });
+      // we can use this.
+      // await waitForElementToBeRemoved(form)
+    });
+  });
+});
+
+```
+
+and the implementation as well
+
+```jsx
+const onClick = async (event) => {
+    event.preventDefault();
+    const body = {
+      username: user,
+      email,
+      password,
+    };
+    setApiProgress(true);
+    try {
+      await axios.post('/api/1.0/users', body);
+      setSignUpSuccess(true);
+    } catch (error) { }
+  };
