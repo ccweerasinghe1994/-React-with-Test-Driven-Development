@@ -21,6 +21,10 @@
   - [Proxy](#proxy)
     - [proxy setup](#proxy-setup)
   - [Styling](#styling)
+    - [removing index css file](#removing-index-css-file)
+    - [adding bootstrap as a cdn link](#adding-bootstrap-as-a-cdn-link)
+    - [implementing bootstrap to the signUp page](#implementing-bootstrap-to-the-signup-page)
+    - [output](#output)
   - [Progress Indicator](#progress-indicator)
   - [Layout - Sign Up Success](#layout---sign-up-success)
   - [Refactor - Test Lifecycle Async Await](#refactor---test-lifecycle-async-await)
@@ -710,19 +714,126 @@ then our request we go to the nodejs server
 
 ## Styling
 
+### removing index css file
+
+remove the index.css file and remove the import from the index.js file aswel.
+
+### adding bootstrap as a cdn link
+
+add the cdn link to the index.html file.
+
+```html
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
+```
+
+### implementing bootstrap to the signUp page
+
 ```jsx
+import axios from "axios";
+import { useEffect, useState } from "react";
+
+const SignUpPage = () => {
+  const [user, setUser] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [disabled, setDisabled] = useState(true);
+
+  const onChange = (e) => {
+    const { value, id } = e.target;
+    if (id === "password") {
+      setPassword(value);
+    }
+    if (id === "repeat-password") {
+      setConfirmPassword(value);
+    }
+    if (id === "email") {
+      setEmail(value);
+    }
+    if (id === "username") {
+      setUser(value);
+    }
+  };
+
+  const onClick = async (event) => {
+    event.preventDefault();
+    const body = {
+      username: user,
+      email,
+      password,
+    };
+    await axios.post("/api/1.0/users", body);
+
+  };
+
+  useEffect(() => {
+    if (
+      password.length > 0 &&
+      confirmPassword.length > 0 &&
+      password === confirmPassword
+    ) {
+      setDisabled(false);
+    } else {
+      setDisabled(true);
+    }
+  }, [confirmPassword, confirmPassword.length, password, password.length]);
+
+  return (
+    <div className="col-lg-6 offset-lg-3 col-md-8 offset-md-2 col-sm-10 offset-sm-1" >
+      <form className="card mt-5" >
+        <div className="card-header">
+          <h1 className="text-center">Sign Up</h1>
+        </div>
+        <div className="card-body">
+
+          <div className="mb-3">
+            <label className="form-label" htmlFor="username">Username</label>
+            <input className="form-control" id="username" onChange={onChange} />
+          </div>
+          <div className="mb-3">
+            <label className="form-label" htmlFor="email">E-mail</label>
+            <input className="form-control" id="email" onChange={onChange} />
+          </div>
+          <div className="mb-3">
+            <label className="form-label" htmlFor="password">Password</label>
+            <input className="form-control" id="password" type={"password"} onChange={onChange} />
+          </div>
+          <div className="mb-3">
+            <label className="form-label" htmlFor="repeat-password">Repeat Password</label>
+            <input className="form-control" type="password" id="repeat-password" onChange={onChange} />
+          </div>
+        </div>
+        <div className="text-center">
+          <div className="card-footer">
+            <button className="btn btn-primary" disabled={disabled} type="submit" onClick={onClick}>
+              Sign Up
+            </button>
+
+          </div>
+        </div>
+      </form>
+    </div>
+  );
+};
+
+export default SignUpPage;
 
 ```
 
-```jsx
+### output
 
-```
-
-```jsx
-
-```
+![card](../img/11.png)
 
 ## Progress Indicator
+
+```jsx
+
+```
+
+```jsx
+
+```
 
 ## Layout - Sign Up Success
 
