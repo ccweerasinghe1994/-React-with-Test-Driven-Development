@@ -7,6 +7,7 @@ const SignUpPage = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [disabled, setDisabled] = useState(true);
+  const [apiProgress, setApiProgress] = useState(false);
 
   const onChange = (e) => {
     const { value, id } = e.target;
@@ -31,6 +32,7 @@ const SignUpPage = () => {
       email,
       password,
     };
+    setApiProgress(true);
     await axios.post("/api/1.0/users", body);
 
   };
@@ -74,13 +76,17 @@ const SignUpPage = () => {
         </div>
         <div className="text-center">
           <div className="card-footer">
-            <button className="btn btn-primary" disabled={disabled} type="submit" onClick={onClick}>
+            <button className="btn btn-primary" disabled={disabled || apiProgress} type="submit" onClick={onClick}>
+              {
+                apiProgress && <span className="spinner-border spinner-border-sm" role="status"></span>
+              }
               Sign Up
             </button>
 
           </div>
         </div>
       </form>
+      <div className="alert alert-success mt-3" >Please check your email to activate the account</div>
     </div>
   );
 };

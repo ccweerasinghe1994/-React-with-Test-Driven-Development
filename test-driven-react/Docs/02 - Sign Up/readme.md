@@ -827,12 +827,173 @@ export default SignUpPage;
 
 ## Progress Indicator
 
-```jsx
+let's slow down the network and try to make multiple requests.
+![progress](../img/12.png)
+as you can see we are allowing multiple request to the backend.when we have to limit this when we have a already running request.
+let's write the test for it.
 
+```jsx
+    it('disable the signUp button when there is a ongoing signUp', async () => {
+      let counter = 0;
+
+      const server = setupServer(
+        rest.post("/api/1.0/users", (req, res, ctx) => {
+          counter = counter + 1;
+          return res(ctx.status(200))
+        })
+      );
+      server.listen()
+
+      render(<SignUpPage />);
+
+      const usernameInput = screen.getByLabelText('Username');
+      const emailInput = screen.getByLabelText('E-mail');
+      const passwordInput = screen.getByLabelText('Password');
+      const repeatPasswordInput = screen.getByLabelText('Repeat Password');
+
+      userEvent.type(usernameInput, 'username');
+      userEvent.type(emailInput, 'abc@gmail.com');
+      userEvent.type(passwordInput, 'password');
+      userEvent.type(repeatPasswordInput, 'password');
+
+      const button = screen.getByRole('button', { name: 'Sign Up' });
+
+      userEvent.click(button);
+      userEvent.click(button);
+
+      await new Promise(resolve => setTimeout(resolve, 500));
+      expect(counter).toBe(1);
+    });
 ```
 
-```jsx
+and now the test are failing because we have to add the functionality.
 
+```jsx
+// let's add the state
+  const [apiProgress, setApiProgress] = useState(false);
+
+// let's set the state 
+  const onClick = async (event) => {
+    event.preventDefault();
+    const body = {
+      username: user,
+      email,
+      password,
+    };
+    setApiProgress(true);
+    await axios.post("/api/1.0/users", body);
+
+  };
+
+  // add the disable logic as well
+   <button className="btn btn-primary" disabled={disabled || apiProgress} type="submit" onClick={onClick}>
+      Sign Up
+    </button>
+```
+
+let's refactor our tests
+
+```jsx
+describe('interactions', () => {
+    let button;
+    const setup = () => {
+      render(<SignUpPage />);
+
+      const usernameInput = screen.getByLabelText('Username');
+      const emailInput = screen.getByLabelText('E-mail');
+      const passwordInput = screen.getByLabelText('Password');
+      const repeatPasswordInput = screen.getByLabelText('Repeat Password');
+
+      userEvent.type(usernameInput, 'username');
+      userEvent.type(emailInput, 'abc@gmail.com');
+      userEvent.type(passwordInput, 'password');
+      userEvent.type(repeatPasswordInput, 'password');
+
+      button = screen.getByRole('button', { name: 'Sign Up' });
+    }
+    it('enables the button when the password and repeat password match', () => {
+      
+      setup();
+      
+      expect(button).not.toBeDisabled();
+    });
+
+    it('send username, password, email to the backend', async () => {
+      let requestBody;
+      const server = setupServer(
+        rest.post("/api/1.0/users", (req, res, ctx) => {
+          requestBody = req.body;
+          return res(ctx.status(200))
+        })
+      );
+      server.listen();
+
+      setup();
+      
+      userEvent.click(button);
+      await new Promise(resolve => setTimeout(resolve, 500))
+      expect(requestBody).toEqual({
+        username: 'username',
+        email: 'abc@gmail.com',
+        password: 'password',
+      });
+    });
+
+    it('disable the signUp button when there is a ongoing signUp', async () => {
+      let counter = 0;
+
+      const server = setupServer(
+        rest.post("/api/1.0/users", (req, res, ctx) => {
+          counter = counter + 1;
+          return res(ctx.status(200))
+        })
+      );
+      server.listen()
+
+      setup();
+
+      userEvent.click(button);
+      userEvent.click(button);
+
+      await new Promise(resolve => setTimeout(resolve, 500));
+      expect(counter).toBe(1);
+    });
+  });
+  ```
+
+let's add a progress bar to the signup button.
+let's write a test first.
+
+```jsx
+    it('display spinner after clicking the submit', async () => {
+
+      const server = setupServer(
+        rest.post("/api/1.0/users", (req, res, ctx) => {
+          return res(ctx.status(200))
+        })
+      );
+      server.listen();
+
+      setup();
+
+      expect(screen.queryByRole('status')).not.toBeInTheDocument();
+
+      userEvent.click(button);
+      const spinner = screen.getByRole('status');
+      expect(spinner).toBeInTheDocument();
+
+    });
+```
+
+now let's add the spinner
+
+```jsx
+    <button className="btn btn-primary" disabled={disabled || apiProgress}              type="submit" onClick={onClick}>
+      {
+        apiProgress && <span className="spinner-border spinner-border-sm" role="status"></span>
+      }
+      Sign Up
+    </button>
 ```
 
 ## Layout - Sign Up Success
