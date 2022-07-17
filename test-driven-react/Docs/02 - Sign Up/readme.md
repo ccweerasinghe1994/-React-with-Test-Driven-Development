@@ -654,7 +654,70 @@ but the downside is it is tightly coupled with the implementation.
 
 ## Proxy
 
+let's run the backend on memory mode
+
+```shell
+npm run start-memo
+```
+
+which will run on port 8080.
+
+let's add this to the url of the post request.
+
+```jsx
+ await axios.post("http://localhost:8080/api/1.0/users", body);
+```
+
+and test it on the browser
+![request](../img/6.png)
+
+as you can see the browser is sending two requests.
+
+this options request is send by the browser because we are sending a request to a different domain.
+
+this is called Cross Origin Request Sharing.(CORS)
+
+this is sent to the backend to make sure the backend is allowing this request.
+
+if we want avoid this options request we can use the proxy.
+
+```json
+"proxy": "http://localhost:8080"
+```
+
+and remove the url part from the post method.
+
+```jsx
+ await axios.post("/api/1.0/users", body);
+```
+
+![react](../img/7.png)
+
+we can see there are no options request.
+
+before the proxy setup
+
+![react](../img/8.png)
+
+then we setup the proxy.
+![react](../img/9.png)
+
+then our request we go to the nodejs server
+![react](../img/10.png)
+
 ## Styling
+
+```jsx
+
+```
+
+```jsx
+
+```
+
+```jsx
+
+```
 
 ## Progress Indicator
 

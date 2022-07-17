@@ -31,7 +31,7 @@ const SignUpPage = () => {
       email,
       password,
     };
-    await axios.post("api/1.0/users", body);
+    await axios.post("/api/1.0/users", body);
   
   };
 
