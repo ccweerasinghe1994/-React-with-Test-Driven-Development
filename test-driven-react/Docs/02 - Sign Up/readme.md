@@ -19,6 +19,7 @@
     - [Mocking Mock Service Worker (MSW)](#mocking-mock-service-worker-msw-1)
     - [msw](#msw)
   - [Proxy](#proxy)
+    - [proxy setup](#proxy-setup)
   - [Styling](#styling)
   - [Progress Indicator](#progress-indicator)
   - [Layout - Sign Up Success](#layout---sign-up-success)
@@ -678,6 +679,8 @@ this options request is send by the browser because we are sending a request to 
 this is called Cross Origin Request Sharing.(CORS)
 
 this is sent to the backend to make sure the backend is allowing this request.
+
+### proxy setup
 
 if we want avoid this options request we can use the proxy.
 
