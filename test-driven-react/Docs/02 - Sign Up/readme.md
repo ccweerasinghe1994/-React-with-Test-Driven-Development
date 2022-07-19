@@ -9,12 +9,23 @@
     - [test output](#test-output)
   - [Layout - Sign Up Form](#layout---sign-up-form)
     - [we can use the container from the render(👎NOT RECOMMENDED)](#we-can-use-the-container-from-the-rendernot-recommended)
+    - [using container to get the input(📛 practice)](#using-container-to-get-the-input-practice)
+    - [using place holder text to get the element(😁 practice)](#using-place-holder-text-to-get-the-element-practice)
+    - [three main way to find the elements 🔎](#three-main-way-to-find-the-elements-)
+    - [Testing library short note 🧪](#testing-library-short-note-)
+      - [search variants](#search-variants)
+      - [render a component](#render-a-component)
+      - [search the dom](#search-the-dom)
+      - [search types](#search-types)
+      - [wait for the appearance](#wait-for-the-appearance)
+      - [render options](#render-options)
     - [SignUp Button](#signup-button)
     - [test result](#test-result)
   - [Form Interactions](#form-interactions)
     - [current output](#current-output)
     - [interactions](#interactions)
   - [Api Request - Sign Up](#api-request---sign-up)
+    - [mock functions from jest](#mock-functions-from-jest)
   - [Mocking Mock Service Worker (MSW)](#mocking-mock-service-worker-msw)
     - [Mocking Mock Service Worker (MSW)](#mocking-mock-service-worker-msw-1)
     - [msw](#msw)
@@ -97,6 +108,8 @@ export default SignUpPage;
 
 ```
 
+### using container to get the input(📛 practice)
+
 ```jsx
 it('has userName input', () => {
   const { container } = render(<SignUpPage />);
@@ -112,8 +125,10 @@ it('has email input', () => {
 });
 ```
 
+### using place holder text to get the element(😁 practice)
+
 this is not a good way to test the code.
-because these test are not specific and they are tied to the dom structure.
+because these test are specific to the way dom is rendered. if we change the order the test will fail.
 so let's fix this. let's add some place holders to the input.
 
 ```jsx
@@ -129,12 +144,42 @@ export default SignUpPage;
 
 ```
 
+### three main way to find the elements 🔎
+
 and we wil use screen to test the input.
 where we have
 
 - 🥇 queryBy..
 - 🥇 getBy...
 - 🥇 findBy...
+
+### Testing library short note 🧪
+
+[detail link](https://testing-library.com/docs/react-testing-library/cheatsheet)
+
+#### search variants
+
+![img](../omg/../img/13.png)
+
+#### render a component
+
+![img](../omg/../img/14.png)
+
+#### search the dom
+
+![img](../omg/../img/15.png)
+
+#### search types
+
+![img](../omg/../img/16.png)
+
+#### wait for the appearance
+
+![img](../omg/../img/17.png)
+
+#### render options
+
+![img](../omg/../img/18.png)
 
 ```jsx
 it('has userName input', () => {
@@ -151,6 +196,7 @@ it('has email input', () => {
 ```
 
 and tets are passing.
+
 ![test output](../img/2.png)
 
 let's use Labels instead of place holders.
@@ -495,6 +541,8 @@ we can't make a real api call in the test.
 because we should be able to run the app without a backend.
 for the test
 
+### mock functions from jest
+
 we are going to use the mock function from jest
 
 ```jsx
@@ -643,34 +691,34 @@ it('send username, password, email to the backend', async () => {
   });
 ```
 
-now if we use axios or fetch we don't have to change the test.
+- now if we use axios or fetch we don't have to change the test.
 
-because we are intercepting the request.
+- because we are intercepting the request.
 
-let's confirm that.
+- let's confirm that.
 
-remove the fetch functionally from the code and see if the tests are still passing.
+- remove the fetch functionally from the code and see if the tests are still passing.
 
-then we can see tests are not affected.
+- then we can see tests are not affected.
 
-with these libraries we can write reliable test cases.
+- with these libraries we can write reliable test cases.
 
-but the downside is it is tightly coupled with the implementation.
+- but the downside is it is tightly coupled with the implementation.
 
 ## Proxy
 
-let's run the backend on memory mode
+- let's run the backend on memory mode
 
 ```shell
 npm run start-memo
 ```
 
-which will run on port 8080.
+- which will run on port 8080.
 
-let's add this to the url of the post request.
+- let's add this to the url of the post request.
 
 ```jsx
- await axios.post("http://localhost:8080/api/1.0/users", body);
+await axios.post("http://localhost:8080/api/1.0/users", body);
 ```
 
 and test it on the browser
