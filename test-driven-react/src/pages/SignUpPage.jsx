@@ -9,6 +9,7 @@ const SignUpPage = () => {
   const [disabled, setDisabled] = useState(true);
   const [apiProgress, setApiProgress] = useState(false);
   const [signUpSuccess, setSignUpSuccess] = useState(false);
+  const [errors, setErrors] = useState({});
 
   const onChange = (e) => {
     const { value, id } = e.target;
@@ -37,9 +38,12 @@ const SignUpPage = () => {
     try {
       await axios.post('/api/1.0/users', body);
       setSignUpSuccess(true);
-    } catch (error) { }
-  };
-
+    } catch (error) {
+      if (error.response.status === 400) {
+        setErrors(error.response.data.validationErrors);
+      }
+    };
+  }
   useEffect(() => {
     if (
       password.length > 0 &&
@@ -69,6 +73,7 @@ const SignUpPage = () => {
                 id='username'
                 onChange={onChange}
               />
+              <span>{errors?.username}</span>
             </div>
             <div className='mb-3'>
               <label className='form-label' htmlFor='email'>
