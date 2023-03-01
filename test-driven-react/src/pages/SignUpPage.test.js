@@ -3,7 +3,6 @@ import {
   render,
   screen,
   waitFor,
-  waitForElementToBeRemoved,
 } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { setupServer } from 'msw/node';
@@ -209,5 +208,23 @@ describe('signup page', () => {
       // we can use this.
       // await waitForElementToBeRemoved(form)
     });
+
+    it("displays validation message for username", async () => {
+      server.use(
+        rest.post('/api/1.0/users', (req, res, ctx) => {
+          return res(ctx.status(400), ctx.json({
+            validationErrors: {
+              username: "Username cannot be null"
+            }
+          }));
+        })
+      )
+      setup();
+
+      userEvent.click(button);
+
+      const validationMessage = await screen.findByText("Username cannot be null");
+      expect(validationMessage).toBeInTheDocument();
+    })
   });
 });
